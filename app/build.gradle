@@ -41,8 +41,14 @@ android {
 }
 
 check {
-    checkstyle { config hard() }
-    findbugs { config hard() }
+    checkstyle {
+        abortOnError true
+        config easy()
+    }
+    findbugs {
+        abortOnError true
+        config hard()
+    }
     pmd {
         config hard()
         skip true
