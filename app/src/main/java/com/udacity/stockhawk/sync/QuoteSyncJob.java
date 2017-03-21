@@ -83,21 +83,12 @@ public final class QuoteSyncJob {
                         quote.getChange() == null ||
                         quote.getChangeInPercent() == null) {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            Toast
-                                    .makeText(
-                                            context.getApplicationContext(),
-                                            context.getString(
-                                                    R.string.toast_symbol_not_found,
-                                                    symbol),
-                                            Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    });
+                    handler.post(() -> Toast
+                            .makeText(
+                                    context.getApplicationContext(),
+                                    context.getString(R.string.toast_symbol_not_found, symbol),
+                                    Toast.LENGTH_SHORT)
+                            .show());
                     PrefUtils.removeStock(context, symbol);
                     continue;
                 }
