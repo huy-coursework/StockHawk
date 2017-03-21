@@ -8,7 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
 
+import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 
@@ -40,7 +44,7 @@ public final class QuoteSyncJob {
     private QuoteSyncJob() {
     }
 
-    static void getQuotes(Context context) {
+    static void getQuotes(final Context context) {
 
         Timber.d("Running sync job");
 
@@ -66,13 +70,37 @@ public final class QuoteSyncJob {
 
             Timber.d(quotes.toString());
 
-            ArrayList<ContentValues> quoteCVs = new ArrayList<>();
+            List<ContentValues> quoteCVs = new ArrayList<>();
 
             while (iterator.hasNext()) {
-                String symbol = iterator.next();
+                final String symbol = iterator.next();
 
                 Stock stock = quotes.get(symbol);
                 StockQuote quote = stock.getQuote();
+
+                // Skip over quotes that don't exist, notifying the user instead.
+                if (quote.getPrice() == null ||
+                        quote.getChange() == null ||
+                        quote.getChangeInPercent() == null) {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            Toast
+                                    .makeText(
+                                            context.getApplicationContext(),
+                                            context.getString(
+                                                    R.string.toast_symbol_not_found,
+                                                    symbol),
+                                            Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    });
+                    PrefUtils.removeStock(context, symbol);
+                    continue;
+                }
 
                 float price = quote.getPrice().floatValue();
                 float change = quote.getChange().floatValue();
