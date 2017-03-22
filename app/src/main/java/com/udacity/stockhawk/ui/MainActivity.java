@@ -1,6 +1,7 @@
 package com.udacity.stockhawk.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,25 +29,35 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
-        SwipeRefreshLayout.OnRefreshListener,
-        StockAdapter.StockAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+                   SwipeRefreshLayout.OnRefreshListener,
+                   StockAdapter.StockAdapterOnClickHandler {
 
     private static final int STOCK_LOADER = 0;
+
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.recycler_view)
     RecyclerView stockRecyclerView;
+
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
+
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.error)
     TextView error;
+
     private StockAdapter adapter;
 
     @Override
     public void onClick(String symbol) {
         Timber.d("Symbol clicked: %s", symbol);
+
+        // Start the ChartActivity with the clicked on stock symbol passed to it.
+        Intent startChartActivityIntent = new Intent(this, ChartActivity.class)
+                .putExtra(ChartActivity.EXTRA_SYMBOL, symbol);
+        startActivity(startChartActivityIntent);
     }
 
     @Override
